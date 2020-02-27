@@ -26,14 +26,14 @@ if __name__ == "__main__":
     train_df = train_df.drop(["id", "target", "kfold"], axis=1)
     valid_df = valid_df.drop(["id", "target", "kfold"], axis=1)
 
+    #train_df = train_df.dropna()
+    #valid_df = valid_df.dropna()
     valid_df = valid_df[train_df.columns]
-    print(valid_df.columns)
-    print(train_df.columns)
 
     label_encoders = []
 
     for c in train_df.columns:
-        print(c)
+        #print(c)
         lbl = preprocessing.LabelEncoder()
         lbl.fit(train_df[c].values.tolist() + valid_df[c].values.tolist())
         train_df.loc[:, c] = lbl.transform(train_df[c].values.tolist())
@@ -41,8 +41,8 @@ if __name__ == "__main__":
         label_encoders.append((c, lbl))
 
     # data is ready to train
-    clf = ensemble.RandomForestClassifier(n_jobs=-1, verbose=2)
+    clf = ensemble.RandomForestClassifier(n_estimators=200, n_jobs=-1, verbose=2)
     clf.fit(train_df, ytrain)
     preds = clf.predict_proba(valid_df)[:, 1]
-    #print(metrics.roc_auc_score(yvalid, preds))
+    print(metrics.roc_auc_score(yvalid, preds))
 
